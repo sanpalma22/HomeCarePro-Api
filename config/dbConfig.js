@@ -1,8 +1,8 @@
 const config = {
   server: "DESKTOP-K5G1LDU\SQLEXPRESS", 
   database: "HomeCareProBD",
-  user: "santiagopalma",
-  password: "santiagopalma",
+  user: "alumno",
+  password: "alumno",
   options: {
     encrypt: false,
     trustServerCertificate: true,
