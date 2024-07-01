@@ -8,10 +8,10 @@ app.use(express.json());
 
 // Configuración de la conexión a la base de datos MSSQL
 const config = {
-  server: "DESKTOP-K5G1LDU\\SQLEXPRESS", 
+  server: "A-PHZ2-CIDI-26", 
   database: "HomeCareProBD",
-  user: "santiagopalma",
-  password: "usuario",
+  user: "alumno",
+  password: "alumno",
   options: {
     encrypt: false,
     trustServerCertificate: true,
@@ -83,6 +83,19 @@ app.get("/casos/:id", async (req,res)=>{
       res.json(result.recordset);
     }
   }
+})
+
+app.get("/casos/:id/devolucion", async (req,res)=>{
+  const id = parseInt(req.params.id)
+  const pool =await getConnection();
+  if(pool){
+    if (pool) {
+      console.log("hola")
+      const result = await sql.query(`SELECT * FROM InformeDia`);
+    res.json(result.recordset);
+    console.log(result)
+  }
+}
 })
 
 // Puerto en el que escucha el servidor
