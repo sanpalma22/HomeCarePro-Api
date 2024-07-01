@@ -8,24 +8,20 @@ app.use(express.json());
 
 // Configuración de la conexión a la base de datos MSSQL
 const config = {
-  server: "A-PHZ2-CIDI-26", // Puede ser localhost si está en el mismo servidor que el backend
+  server: "DESKTOP-K5G1LDU\\SQLEXPRESS", 
   database: "HomeCareProBD",
-  user: "alumno",
-  password: "alumno",
+  user: "santiagopalma",
+  password: "usuario",
   options: {
     encrypt: false,
     trustServerCertificate: true,
-    enableArithAbort: true, // Para evitar problemas de aritmética
-  }
+    enableArithAbort: true, 
+  },
 };
 
 const getConnection = async () => {
   try {
     const pool = await sql.connect(config);
-
-    const result= await pool.request().query("SELECT * FROM Especialidad")
-    console.log(result)
-
     return pool;
   } catch (error) {
     console.error("Error al conectar con la base de datos:", error.message, error.code);
@@ -34,7 +30,7 @@ const getConnection = async () => {
 }; 
 
 // Ruta para obtener los casos activos desde la base de datos
-app.get("/api/casos", async (req, res) => {
+app.get("/casos", async (req, res) => {
   try {
     const pool = await getConnection();
     if (pool) {
