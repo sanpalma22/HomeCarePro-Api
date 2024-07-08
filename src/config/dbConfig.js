@@ -1,7 +1,7 @@
 const config = {
     user : 'alumno',
     password: 'alumno',
-    server: 'A-NHFY-INFO-17',
+    server: 'A-PHZ2-CIDI-44',
     database: 'HomeCareProBD',
     options: {
         trustServerCertificate : true,
