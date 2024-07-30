@@ -11,7 +11,7 @@ app.use(express.json());
 
 const getConnection = async () => {
   try {
-    const pool = await sql.connect(config);
+    const pool = await sql.connect(config); //http://localhost:5000
     return pool;
   } catch (error) {
     console.error("Error al conectar con la base de datos:", error.message, error.code);
@@ -95,11 +95,28 @@ app.get("/medico/:id", async (req,res)=>{
     if (pool) {
       console.log("hola")
       const result = await sql.query( `
-      SELECT c.FechaOcurrencia, c.FechaSolicitud, c.Diagnostico, c.CantDias, c.CantHorasDias, c.EnCurso, c.Idcaso, pa.Dni, pa.Nombre, pa.Apellido, pa.Direccion, pa.Localidad, pa.Telefono, pa.FechaNacimiento, pr.Nombre as NombrePrestador
+      SELECT c.IdCaso, c.FechaOcurrencia, c.FechaSolicitud, c.Diagnostico, c.CantDias, c.CantHorasDias, c.EnCurso, c.Idcaso, pa.Dni, pa.Nombre, pa.Apellido, pa.Direccion, pa.Localidad, pa.Telefono, pa.FechaNacimiento, pr.Nombre as NombrePrestador
       FROM Caso AS c INNER JOIN Paciente as pa ON pa.IdPaciente = c.IdPaciente
       INNER JOIN Prestador as pr ON pr.IdPrestador = c.IdPrestador
       
       WHERE c.IdPrestador = ${id}
+    `)
+    console.log(result.recordset)
+    res.json(result.recordset);
+
+  }
+}
+})
+
+app.get("/medico/:id/devolucion", async (req,res)=>{
+  const id = parseInt(req.params.id)
+  const pool =await getConnection();
+  if(pool){
+    if (pool) {
+      console.log("hola")
+      const result = await sql.query( `
+      SELECT id.Descripcion from Caso as c INNER JOIN InformeDia as id ON id.IdCaso = c.IdCaso
+      WHERE c.IdCaso = ${id}
     `)
     console.log(result.recordset)
     res.json(result.recordset);
