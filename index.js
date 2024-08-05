@@ -94,6 +94,17 @@ app.get("/prestadores/:id", async (req,res)=>{
   }
 })
 
+app.post("/casos", async (req,res)=>{
+  const pool=await getConnection();
+  if(pool){
+    if (pool) {
+      
+    res.json(result.recordset);
+    console.log(result)
+  }
+}
+})
+
 // Puerto en el que escucha el servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
