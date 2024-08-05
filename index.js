@@ -81,12 +81,73 @@ app.get("/casos/:id/devolucion", async (req,res)=>{
   if(pool){
     if (pool) {
       console.log("hola")
-      const result = await sql.query(`SELECT * FROM InformeDia`);
+      console.log(req.params.id);
+      const result = await sql.query(`SELECT * FROM InformeDia where IdCaso = ${id} `);
     res.json(result.recordset);
     console.log(result)
   }
 }
 })
+app.post("/casos", async (req, res) => {
+  const { Nombre, Localidad, Dni, Prestacion, Telefono, Diagnostico, Direccion, FechaNacimiento, CantDias, CantHorasDias } = req.body;
+
+  if (!Nombre || !Localidad || !Dni || !Prestacion || !Telefono || !Diagnostico || !Direccion || !FechaNacimiento || !CantDias || !CantHorasDias) {
+    return res.status(400).json({ error: "Faltan datos" });
+  }
+
+  try {
+    const pool = await getConnection();
+
+    if (!pool) {
+      return res.status(500).json({ error: "No se pudo conectar a la base de datos" });
+    }
+
+    // Inserción en la tabla Paciente
+    const query1 = `
+      INSERT INTO Paciente (Dni, Nombre, Apellido, Direccion, Localidad, Telefono, FechaNacimiento)
+      VALUES (@dni, @nombre, @apellido, @direccion, @localidad, @telefono, @fechaNacimiento);
+    `;
+    await pool.request()
+      .input('dni', sql.Int, Dni)
+      .input('nombre', sql.NVarChar, Nombre)
+      .input('apellido', sql.NVarChar, "Pasquale")
+      .input('direccion', sql.NVarChar, Direccion)
+      .input('localidad', sql.NVarChar, Localidad)
+      .input('telefono', sql.Int, Telefono)
+      .input('fechaNacimiento', sql.DateTime, new Date(FechaNacimiento)) // Convertir a objeto Date si es necesario
+      .query(query1);
+
+    // Obtener el IdPaciente recién insertado
+    const result1 = await pool.request()
+      .input('dni', sql.Int, Dni)
+      .query(`SELECT IdPaciente FROM Paciente WHERE Dni = @dni`);
+    
+    const idPaciente = result1.recordset[0].IdPaciente;
+
+    // Inserción en la tabla Caso
+    const query2 = `
+      INSERT INTO Caso (IdPaciente, FechaSolicitud, Diagnostico, CantDias, CantHorasDias, EnCurso)
+      VALUES (@idPaciente, @fechaSolicitud, @diagnostico, @cantDias, @cantHorasDias, @enCurso);
+    `;
+    const fechaSolicitud = new Date();
+    const enCurso = false;
+    
+    await pool.request()
+      .input('idPaciente', sql.Int, idPaciente)
+      .input('fechaSolicitud', sql.DateTime, fechaSolicitud)
+      .input('diagnostico', sql.NVarChar, Diagnostico)
+      .input('cantDias', sql.Int, parseInt(CantDias))
+      .input('cantHorasDias', sql.Int, parseInt(CantHorasDias))
+      .input('enCurso', sql.Bit, enCurso)
+      .query(query2);
+
+    res.status(201).json({ message: "Caso creado exitosamente" });
+
+  } catch (error) {
+    console.error("Error en la inserción:", error);
+    res.status(500).json({ error: "Error en la inserción" });
+  }
+});
 
 app.get("/medico/:id", async (req,res)=>{
   const id = parseInt(req.params.id)
@@ -110,20 +171,62 @@ app.get("/medico/:id", async (req,res)=>{
 
 app.get("/medico/:id/devolucion", async (req,res)=>{
   const id = parseInt(req.params.id)
+  
   const pool =await getConnection();
+  console.log(id)
   if(pool){
     if (pool) {
-      console.log("hola")
+      console.log("holaaaaaaaaaaa")
       const result = await sql.query( `
-      SELECT id.Descripcion from Caso as c INNER JOIN InformeDia as id ON id.IdCaso = c.IdCaso
-      WHERE c.IdCaso = ${id}
+      SELECT Caso.Idcaso, InformeDia.Descripcion from Caso INNER JOIN InformeDia ON InformeDia.IdCaso = Caso.IdCaso
+      WHERE Caso.IdCaso = ${id}
     `)
     console.log(result.recordset)
-    res.json(result.recordset);
-
+    res.json(result);
   }
 }
 })
+
+
+app.post("/medico/:id/devolucion", async (req, res) => { 
+  const id = parseInt(req.params.id, 10); // Convertir a número entero
+  const descripcion = req.body.Descripcion;
+
+  // Validar el ID y la descripción
+  if (isNaN(id)) {
+      return res.status(400).json({ error: "ID inválido" });
+  }
+  if (!descripcion) {
+      return res.status(400).json({ error: "Descripción es requerida" });
+  }
+
+  try {
+      const pool = await getConnection();
+
+      if (!pool) {
+          return res.status(500).json({ error: "No se pudo conectar a la base de datos" });
+      }
+
+      const fecha = new Date().toISOString();
+      const query = `
+          INSERT INTO InformeDia (IdCaso, Fecha, Descripcion)
+          VALUES (@id, @fecha, @descripcion)
+      `;
+
+      const result = await pool.request()
+          .input('id', sql.Int, id)
+          .input('fecha', sql.DateTime, fecha)
+          .input('descripcion', sql.NVarChar, descripcion)
+          .query(query);
+
+      console.log(result);
+      res.status(201).json(result); // Responder con código de estado 201 para una creación exitosa
+  } catch (error) {
+      console.error("Error en la inserción:", error);
+      res.status(500).json({ error: "Error en la inserción" });
+  }
+});
+
 
 // Puerto en el que escucha el servidor
 const PORT = process.env.PORT || 5000;
