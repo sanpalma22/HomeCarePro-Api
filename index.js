@@ -187,10 +187,11 @@ app.get("/medico/:id/devolucion", async (req,res)=>{
 }
 })
 
-
-app.post("/medico/:id/devolucion", async (req, res) => { 
+app.post("/medico/:id/devolucionn", async (req, res) => { 
   const id = parseInt(req.params.id, 10); // Convertir a número entero
-  const descripcion = req.body.Descripcion;
+  const { descripcion } = req.body; // Extraer la descripción del cuerpo de la solicitud
+  
+  console.log("Descripción:", descripcion);
 
   // Validar el ID y la descripción
   if (isNaN(id)) {
@@ -220,6 +221,7 @@ app.post("/medico/:id/devolucion", async (req, res) => {
           .query(query);
 
       console.log(result);
+
       res.status(201).json(result); // Responder con código de estado 201 para una creación exitosa
   } catch (error) {
       console.error("Error en la inserción:", error);
