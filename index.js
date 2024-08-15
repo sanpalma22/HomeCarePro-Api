@@ -1,4 +1,4 @@
-const config = require("./config/dbConfig");
+const config = require("./src/config/dbConfig");
 const express = require("express");
 const cors = require("cors");
 const sql = require("mssql");
@@ -76,6 +76,7 @@ app.get("/casos/:id", async (req,res)=>{
 })
 
 app.get("/casos/:id/devolucion", async (req,res)=>{
+  
   const id = parseInt(req.params.id)
   const pool =await getConnection();
   if(pool){
@@ -89,9 +90,9 @@ app.get("/casos/:id/devolucion", async (req,res)=>{
 }
 })
 app.post("/casos", async (req, res) => {
-  const { Nombre, Localidad, Dni, Prestacion, Telefono, Diagnostico, Direccion, FechaNacimiento, CantDias, CantHorasDias } = req.body;
+  const { nombre, localidad, dni, prestacion, telefono, diagnostico, direccion, fechaNacimiento, cantDias, horasDia } = req.body;
 
-  if (!Nombre || !Localidad || !Dni || !Prestacion || !Telefono || !Diagnostico || !Direccion || !FechaNacimiento || !CantDias || !CantHorasDias) {
+  if (!nombre || !localidad || !dni || !prestacion || !telefono || !diagnostico || !direccion || !fechaNacimiento || !cantDias || !horasDia) {
     return res.status(400).json({ error: "Faltan datos" });
   }
 
@@ -108,36 +109,42 @@ app.post("/casos", async (req, res) => {
       VALUES (@dni, @nombre, @apellido, @direccion, @localidad, @telefono, @fechaNacimiento);
     `;
     await pool.request()
-      .input('dni', sql.Int, Dni)
-      .input('nombre', sql.NVarChar, Nombre)
+      .input('dni', sql.Int, parseInt(dni)) // Cambiado a dni
+      .input('nombre', sql.NVarChar, nombre)
       .input('apellido', sql.NVarChar, "Pasquale")
-      .input('direccion', sql.NVarChar, Direccion)
-      .input('localidad', sql.NVarChar, Localidad)
-      .input('telefono', sql.Int, Telefono)
-      .input('fechaNacimiento', sql.DateTime, new Date(FechaNacimiento)) // Convertir a objeto Date si es necesario
+      .input('direccion', sql.NVarChar, direccion)
+      .input('localidad', sql.NVarChar, localidad)
+      .input('telefono', sql.Int, parseInt(telefono))
+      .input('fechaNacimiento', sql.DateTime, new Date(fechaNacimiento))
       .query(query1);
 
     // Obtener el IdPaciente recién insertado
     const result1 = await pool.request()
-      .input('dni', sql.Int, Dni)
+      .input('dni', sql.Int, parseInt(dni)) // Cambiado a dni
       .query(`SELECT IdPaciente FROM Paciente WHERE Dni = @dni`);
-    
+
+    if (result1.recordset.length === 0) {
+      return res.status(500).json({ error: "Paciente no encontrado" });
+    }
+
     const idPaciente = result1.recordset[0].IdPaciente;
 
     // Inserción en la tabla Caso
     const query2 = `
-      INSERT INTO Caso (IdPaciente, FechaSolicitud, Diagnostico, CantDias, CantHorasDias, EnCurso)
-      VALUES (@idPaciente, @fechaSolicitud, @diagnostico, @cantDias, @cantHorasDias, @enCurso);
+      INSERT INTO Caso (IdPaciente, IdPrestador, IdPrestacion, FechaSolicitud, Diagnostico, CantDias, CantHorasDias, EnCurso)
+      VALUES (@idPaciente, @idPrestador, @idPrestacion, @fechaSolicitud, @diagnostico, @cantDias, @cantHorasDias, @enCurso);
     `;
     const fechaSolicitud = new Date();
-    const enCurso = false;
-    
+    const enCurso = true;
+
     await pool.request()
       .input('idPaciente', sql.Int, idPaciente)
+      .input('idPrestador', sql.Int,1)
+      .input('idPrestacion', sql.Int,1)
       .input('fechaSolicitud', sql.DateTime, fechaSolicitud)
-      .input('diagnostico', sql.NVarChar, Diagnostico)
-      .input('cantDias', sql.Int, parseInt(CantDias))
-      .input('cantHorasDias', sql.Int, parseInt(CantHorasDias))
+      .input('diagnostico', sql.NVarChar, diagnostico)
+      .input('cantDias', sql.Int, parseInt(cantDias))
+      .input('cantHorasDias', sql.Int, parseInt(horasDia))
       .input('enCurso', sql.Bit, enCurso)
       .query(query2);
 
@@ -145,9 +152,31 @@ app.post("/casos", async (req, res) => {
 
   } catch (error) {
     console.error("Error en la inserción:", error);
-    res.status(500).json({ error: "Error en la inserción" });
+    res.status(500).json({ error: "Error en la inserción", details: error.message });
   }
 });
+
+app.get("/medicos", async (req, res) => {
+  try {
+    const pool = await getConnection();
+    if (pool) {
+      const result = await sql.query(`
+            SELECT 
+                P.*,
+                E.Nombre AS Especialidad
+            FROM 
+                Prestador P
+                INNER JOIN Especialidad E ON P.IdEspecialidad = E.IdEspecialidad`);
+      res.json(result.recordset);
+    } else {
+      res.status(500).json({ message: "No se pudo establecer conexión con la base de datos" });
+    }
+  } catch (error) {
+    console.error("Error al obtener los casos activos:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+});
+
 
 app.get("/medico/:id", async (req,res)=>{
   const id = parseInt(req.params.id)
