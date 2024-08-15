@@ -230,6 +230,38 @@ app.post("/medico/:id/devolucionn", async (req, res) => {
 });
 
 
+app.get("/medicoo/login", async (req, res) => {
+  try {
+      console.log("entro");
+      
+      // Obtener el valor del mail del query string (en lugar de req.body)
+      const { mail } = req.query;
+      console.log("Mail:", mail);
+      
+      // Obtener la conexión a la base de datos
+      const pool = await getConnection();
+      
+      if (pool) {
+          console.log("holaaaaaaaaaaa");
+          
+          // Consulta SQL usando parámetros
+          const result = await pool.request()
+              .input('mail', sql.VarChar, mail) // Usar parámetros para evitar problemas
+              .query('SELECT IdPrestador, Contraseña FROM Prestador WHERE Email = @mail');
+              
+          console.log(result.recordset);
+          res.json(result.recordset);
+      } else {
+          res.status(500).json({ error: 'No se pudo establecer conexión con la base de datos' });
+      }
+  } catch (err) {
+      console.error('Error en la solicitud:', err);
+      res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
+
+
 // Puerto en el que escucha el servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
