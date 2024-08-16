@@ -290,6 +290,47 @@ app.get("/medicoo/login", async (req, res) => {
 });
 
 
+app.put("/medicooo/contrasena", async (req, res) => {
+  try {
+      console.log("entro");
+      
+      // Obtener el valor del mail y la contraseña del cuerpo de la solicitud
+      const { email, contraseña } = req.body;
+
+      console.log("Mail:", email);
+      console.log("Contraseña:", contraseña);
+
+      // Obtener la conexión a la base de datos
+      const pool = await getConnection();
+
+      if (pool) {
+          console.log("Conexión a la base de datos establecida");
+
+          // Consulta SQL para actualizar la contraseña
+          await pool.request()
+              .input('email', sql.VarChar, email)
+              .input('contraseña', sql.VarChar, contraseña)
+              .query('UPDATE Prestador SET Contraseña = @contraseña WHERE Email = @email');
+
+          console.log("Contraseña cambiada correctamente");
+
+          // Consulta SQL para obtener el IdPrestador
+          const result1 = await pool.request()
+              .input('email', sql.VarChar, email) // Asegúrate de pasar el parámetro
+              .query('SELECT IdPrestador FROM Prestador WHERE Email = @email');
+
+          console.log(result1.recordset);
+
+          // Devolver el IdPrestador en la respuesta
+          res.json(result1.recordset);
+      } else {
+          res.status(500).json({ error: 'No se pudo establecer conexión con la base de datos' });
+      }
+  } catch (err) {
+      console.error('Error en la solicitud:', err);
+      res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
 
 // Puerto en el que escucha el servidor
 const PORT = process.env.PORT || 5000;
