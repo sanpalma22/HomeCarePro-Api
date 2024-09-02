@@ -331,7 +331,36 @@ app.put("/medicooo/contrasena", async (req, res) => {
       res.status(500).json({ error: 'Error en el servidor' });
   }
 });
+const nodemailer = require('nodemailer');
 
+// Configura el transporte para enviar correos electrónicos
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'loyu7706@gmail.com',
+    pass: 'Loyuel11'
+  }
+});
+
+
+app.get('/medicoooo/codigo', async (req, res) => {
+
+  try {
+    const mailOptions = {
+      from: 'loyu7706@gmail.com', 
+      to: 'ramirosued07@gmail.com', 
+      subject: 'Hola', 
+      text: 'Hola' 
+    };
+    console.log("1111");
+    // Envía el correo electrónico
+    await transporter.sendMail(mailOptions);
+    console.log("22222");
+    console.log('Correo enviado exitosamente');
+  } catch (error) {
+    console.error('Error al enviar el correo:', error);
+  }
+});
 // Puerto en el que escucha el servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
