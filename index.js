@@ -30,6 +30,7 @@ app.get("/casos", async (req, res) => {
                 C.FechaOcurrencia,
                 C.FechaSolicitud,
                 C.Diagnostico,
+                C.EnCurso,
                 P.Nombre AS NombrePaciente,
                 PR.Nombre AS NombrePrestador,
                 PS.Nombre AS NombrePrestacion
