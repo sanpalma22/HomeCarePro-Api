@@ -1,5 +1,5 @@
 const config = {
-  server: "A-PHZ2-CIDI-26", 
+  server: "A-PHZ2-CEO-21", 
   database: "HomeCareProBD",
   user: "alumno",
   password: "alumno",
@@ -10,4 +10,4 @@ const config = {
   },
 };
 
-module.exports = config;
+export default config;
