@@ -14,7 +14,7 @@ const getConnection = async () => {
 }; 
 
 
-app.post('', async (req, res) => {
+router.post('', async (req, res) => {
     const { dni, nombre, apellido, direccion, localidad, telefono, email, genero, contraseña } = req.body;
   
     if (!nombre || !localidad || !dni || !apellido || !telefono || !email || !direccion || !genero || !contraseña) {
