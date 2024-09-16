@@ -1,9 +1,10 @@
 import express from "express";
 import cors from "cors";
 import CasoController from "./src/controllers/caso-controller.js";;
-import MedicoController from "./src/controllers/medico-controller.js";;
-import PrestadorController from "./src/controllers/prestador-controller.js";;
-
+import MedicoController from "./src/controllers/medico-controller.js";
+import PrestadorController from "./src/controllers/prestador-controller.js";
+import Especialidadcontroller from "./src/controllers/especialidad-contrroller.js";;
+import PrestacionController from "./src/controllers/prestacion-controller.js";
 import config from "./src/config/dbConfig.js";
 import { MailerSend } from 'mailersend';
 
@@ -14,11 +15,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Configuración de la conexión a la base de datos MSSQL
+
 app.use("/casos", CasoController)
+
 app.use("/medicos", MedicoController)
+
 app.use("/prestadores", PrestadorController)
 
+app.use("/prestadores", PrestadorController)
+
+app.use("/especialidad", Especialidadcontroller)
+
+app.use("/prestacion", PrestacionController)
 
 
 const getConnection = async () => {
@@ -32,10 +40,6 @@ const getConnection = async () => {
 }; 
 
 // Ruta para obtener los casos activos desde la base de datos
-
-
-
-
 
 
 
@@ -60,8 +64,8 @@ app.get("/medico/:id/devolucion", async (req,res)=>{
 })
 
 app.post("/medico/:id/devolucionn", async (req, res) => { 
-  const id = parseInt(req.params.id, 10); // Convertir a número entero
-  const { descripcion } = req.body; // Extraer la descripción del cuerpo de la solicitud
+  const id = parseInt(req.params.id, 10); 
+  const { descripcion } = req.body; 
   
   console.log("Descripción:", descripcion);
 
@@ -94,7 +98,7 @@ app.post("/medico/:id/devolucionn", async (req, res) => {
 
       console.log(result);
 
-      res.status(201).json(result); // Responder con código de estado 201 para una creación exitosa
+      res.status(201).json(result); 
   } catch (error) {
       console.error("Error en la inserción:", error);
       res.status(500).json({ error: "Error en la inserción" });
@@ -106,19 +110,16 @@ app.get("/medicoo/login", async (req, res) => {
   try {
       console.log("entro");
       
-      // Obtener el valor del mail del query string (en lugar de req.body)
       const { mail } = req.query;
       console.log("Mail:", mail);
       
-      // Obtener la conexión a la base de datos
       const pool = await getConnection();
       
       if (pool) {
           console.log("holaaaaaaaaaaa");
           
-          // Consulta SQL usando parámetros
           const result = await pool.request()
-              .input('mail', sql.VarChar, mail) // Usar parámetros para evitar problemas
+              .input('mail', sql.VarChar, mail)
               .query('SELECT IdPrestador, Contraseña FROM Prestador WHERE Email = @mail');
               
           console.log(result.recordset);
@@ -137,19 +138,16 @@ app.put("/medicooo/contrasena", async (req, res) => {
   try {
       console.log("entro");
       
-      // Obtener el valor del mail y la contraseña del cuerpo de la solicitud
       const { email, contraseña } = req.body;
 
       console.log("Mail:", email);
       console.log("Contraseña:", contraseña);
 
-      // Obtener la conexión a la base de datos
       const pool = await getConnection();
 
       if (pool) {
           console.log("Conexión a la base de datos establecida");
 
-          // Consulta SQL para actualizar la contraseña
           await pool.request()
               .input('email', sql.VarChar, email)
               .input('contraseña', sql.VarChar, contraseña)
@@ -157,14 +155,12 @@ app.put("/medicooo/contrasena", async (req, res) => {
 
           console.log("Contraseña cambiada correctamente");
 
-          // Consulta SQL para obtener el IdPrestador
           const result1 = await pool.request()
-              .input('email', sql.VarChar, email) // Asegúrate de pasar el parámetro
+              .input('email', sql.VarChar, email) 
               .query('SELECT IdPrestador FROM Prestador WHERE Email = @email');
 
           console.log(result1.recordset);
 
-          // Devolver el IdPrestador en la respuesta
           res.json(result1.recordset);
       } else {
           res.status(500).json({ error: 'No se pudo establecer conexión con la base de datos' });
