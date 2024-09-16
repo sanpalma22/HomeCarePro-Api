@@ -89,7 +89,7 @@ router.get("/:id/devolucion", async (req,res)=>{
 router.post('', async (req, res) => {
   const { nombre, localidad, dni, prestacion, telefono, diagnostico, direccion, fechaNacimiento, cantDias, horasDia, prestador } = req.body;
   console.log(prestador)
-  if (!nombre || !localidad || !dni || !prestacion || !telefono || !diagnostico || !direccion || !fechaNacimiento || !cantDias || !horasDia || !prestador) {
+  if (!nombre || !localidad || !dni || !prestacion || !telefono || !diagnostico || !direccion || !fechaNacimiento || !cantDias || !horasDia) {
     return res.status(400).json({ error: "Faltan datos" });
   }
 
@@ -125,19 +125,8 @@ router.post('', async (req, res) => {
     }
     console.log("prestaciopn " + prestacion)
 
-    const result2 = await pool.request()
-    .input('idPrestacion', sql.NVarChar,prestacion) // Cambiado a dni
-    .query(`SELECT IdPrestacion FROM Prestacion WHERE Nombre = @idPrestacion`);
-
-    const result3 = await pool.request()
-    .input('idPrestador', sql.NVarChar,prestador) // Cambiado a dni
-    .query(`SELECT IdPrestador FROM Prestador WHERE Nombre = @idPrestador`);
 
     const idPaciente = result1.recordset[0].IdPaciente;
-    const idPrestacion = result2.recordset[0].IdPrestacion;
-    console.log(result3.recordset[0])
-    const idPrestador = result3.recordset[0].IdPrestador;
-    console.log(idPrestador)
 
     // Inserción en la tabla Caso
     const query4 = `
@@ -149,8 +138,8 @@ router.post('', async (req, res) => {
 
     await pool.request()
       .input('idPaciente', sql.Int, idPaciente)
-      .input('idPrestador', sql.Int,idPrestador)
-      .input('idPrestacion', sql.Int,idPrestacion)
+      .input('idPrestador', sql.Int,prestador)
+      .input('idPrestacion', sql.Int,prestacion)
       .input('fechaSolicitud', sql.DateTime, fechaSolicitud)
       .input('diagnostico', sql.NVarChar, diagnostico)
       .input('cantDias', sql.Int, parseInt(cantDias))
