@@ -260,6 +260,152 @@ app.post("/medico/:id/devolucionn", async (req, res) => {
 });
 
 
+app.get("/medicoo/login", async (req, res) => {
+  try {
+      console.log("entro");
+      
+      // Obtener el valor del mail del query string (en lugar de req.body)
+      const { mail } = req.query;
+      console.log("Mail:", mail);
+      
+      // Obtener la conexión a la base de datos
+      const pool = await getConnection();
+      
+      if (pool) {
+          console.log("holaaaaaaaaaaa");
+          
+          // Consulta SQL usando parámetros
+          const result = await pool.request()
+              .input('mail', sql.VarChar, mail) // Usar parámetros para evitar problemas
+              .query('SELECT IdPrestador, Contraseña FROM Prestador WHERE Email = @mail');
+              
+          console.log(result.recordset);
+          res.json(result.recordset);
+      } else {
+          res.status(500).json({ error: 'No se pudo establecer conexión con la base de datos' });
+      }
+  } catch (err) {
+      console.error('Error en la solicitud:', err);
+      res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
+
+app.put("/medicooo/contrasena", async (req, res) => {
+  try {
+      console.log("entro");
+      
+      // Obtener el valor del mail y la contraseña del cuerpo de la solicitud
+      const { email, contraseña } = req.body;
+
+      console.log("Mail:", email);
+      console.log("Contraseña:", contraseña);
+
+      // Obtener la conexión a la base de datos
+      const pool = await getConnection();
+
+      if (pool) {
+          console.log("Conexión a la base de datos establecida");
+
+          // Consulta SQL para actualizar la contraseña
+          await pool.request()
+              .input('email', sql.VarChar, email)
+              .input('contraseña', sql.VarChar, contraseña)
+              .query('UPDATE Prestador SET Contraseña = @contraseña WHERE Email = @email');
+
+          console.log("Contraseña cambiada correctamente");
+
+          // Consulta SQL para obtener el IdPrestador
+          const result1 = await pool.request()
+              .input('email', sql.VarChar, email) // Asegúrate de pasar el parámetro
+              .query('SELECT IdPrestador FROM Prestador WHERE Email = @email');
+
+          console.log(result1.recordset);
+
+          // Devolver el IdPrestador en la respuesta
+          res.json(result1.recordset);
+      } else {
+          res.status(500).json({ error: 'No se pudo establecer conexión con la base de datos' });
+      }
+  } catch (err) {
+      console.error('Error en la solicitud:', err);
+      res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+const nodemailer = require('nodemailer');
+
+// Configura el transporte para enviar correos electrónicos
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'loyu7706@gmail.com',
+    pass: 'Loyuel11'
+  }
+});
+
+
+app.get('/medicoooo/codigo', async (req, res) => {
+
+  try {
+    const mailOptions = {
+      from: 'loyu7706@gmail.com', 
+      to: 'ramirosued07@gmail.com', 
+      subject: 'Hola', 
+      text: 'Hola' 
+    };
+    console.log("1111");
+    // Envía el correo electrónico
+    await transporter.sendMail(mailOptions);
+    console.log("22222");
+    console.log('Correo enviado exitosamente');
+  } catch (error) {
+    console.error('Error al enviar el correo:', error);
+  }
+});
+
+app.post("/prestadores", async (req, res) => {
+  const { dni, nombre, apellido, direccion, localidad, telefono, email, genero, contraseña } = req.body;
+
+  if (!nombre || !localidad || !dni || !apellido || !telefono || !email || !direccion || !genero || !contraseña) {
+    return res.status(400).json({ error: "Faltan datos" });
+  }
+
+  try {
+    const pool = await getConnection();
+
+    if (!pool) {
+      return res.status(500).json({ error: "No se pudo conectar a la base de datos" });
+    }
+
+    // Inserción en la tabla Paciente
+    const query1 = `
+      INSERT INTO Prestador (IdEspecialidad, Dni, Nombre, Apellido, Direccion, Localidad, Telefono, Email, Genero, Contraseña)
+      VALUES (@idEspecialidad, @dni, @nombre, @apellido, @direccion, @localidad, @telefono, @email, @genero, @contraseña);
+    `;
+    await pool.request()
+      .input('idEspecialidad', sql.Int, 1) // Cambiado a dni
+      .input('dni', sql.Int, dni) // Cambiado a dni
+      .input('nombre', sql.NVarChar, nombre)
+      .input('apellido', sql.NVarChar, apellido)
+      .input('direccion', sql.NVarChar, direccion)
+      .input('localidad', sql.NVarChar, localidad)
+      .input('telefono', sql.Int, parseInt(telefono))
+      .input('email', sql.NVarChar, email)
+      .input('genero', sql.NVarChar, genero)
+      .input('contraseña', sql.NVarChar, contraseña)
+      .query(query1);
+
+
+  
+    res.status(201).json({ message: "Prestador creado exitosamente" });
+
+  } catch (error) {
+    console.error("Error en la inserción:", error);
+    res.status(500).json({ error: "Error en la inserción", details: error.message });
+  }
+});
+
+
 // Puerto en el que escucha el servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

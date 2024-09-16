@@ -1,11 +1,13 @@
 const config = {
-    user : 'alumno',
-    password: 'alumno',
-    server: 'A-PHZ2-CEO-11',
-    database: 'HomeCareProBD',
-    options: {
-        trustServerCertificate : true,
-        trustedConnection : true
-    }
-}
+  server: "A-PHZ2-CIDI-27", 
+  database: "HomeCareProBD",
+  user: "alumno",
+  password: "alumno",
+  options: {
+    encrypt: false,
+    trustServerCertificate: true,
+    enableArithAbort: true, 
+  },
+};
+
 module.exports = config;
