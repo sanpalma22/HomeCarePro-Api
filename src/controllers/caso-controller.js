@@ -155,5 +155,45 @@ router.post('', async (req, res) => {
   }
 });
 
+router.put("solicitar/:id", async (req,res)=>{
+  const id = req.params.id;
+  const pool = await getConnection();
+  if(pool){
+    console.log("hola")
+    const result = await pool.request()
+                  .input('IdCaso', sql.Int, id)
+                  .input('SolicitarCierre', sql.Bit, true) // TRUE se convierte a un valor booleano
+                  .query(`UPDATE Caso SET SolicitarCierre = @SolicitarCierre WHERE IdCaso = @IdCaso`);
+    console.log(result.recordset)
+  }
+  })
+
+  //para marcar el caso como cerrado(lo hace el operador)
+  router.put("confirmar/:id", async (req,res)=>{
+    const id = req.params.id;
+    const pool = await getConnection();
+    if(pool){
+      console.log("hola")
+      const result = await pool.request()
+                    .input('IdCaso', sql.Int, id)
+                    .input('SolicitarCierre', sql.Bit, false) // TRUE se convierte a un valor booleano
+                    .query(`UPDATE Caso SET EnCurso = @SolicitarCierre WHERE IdCaso = @IdCaso`);
+      console.log(result.recordset)
+    }
+    })
+
+    //en caso de que el operador no acepte cerrar el caso
+    router.put("noaceptarcierre/:id", async (req,res)=>{
+      const id = req.params.id;
+      const pool = await getConnection();
+      if(pool){
+        console.log("hola")
+        const result = await pool.request()
+                      .input('IdCaso', sql.Int, id)
+                      .input('SolicitarCierre', sql.Bit, false) // TRUE se convierte a un valor booleano
+                      .query(`UPDATE Caso SET SolicitarCierre = @SolicitarCierre WHERE IdCaso = @IdCaso`);
+        console.log(result.recordset)
+      }
+      })
 
   export default router;
