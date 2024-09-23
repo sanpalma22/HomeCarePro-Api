@@ -22,8 +22,6 @@ app.use("/medicos", MedicoController)
 
 app.use("/prestadores", PrestadorController)
 
-app.use("/prestadores", PrestadorController)
-
 app.use("/especialidad", Especialidadcontroller)
 
 app.use("/prestacion", PrestacionController)
