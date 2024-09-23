@@ -158,13 +158,14 @@ router.post('', async (req, res) => {
 
 router.put("/solicitar/:id", async (req,res)=>{
   const id = req.params.id;
+  console.log(id)
   const pool = await getConnection();
   if(pool){
     console.log("hola")
     const result = await pool.request()
                   .input('IdCaso', sql.Int, id)
-                  .input('SolicitarCierre', sql.Bit, true) 
-                  .query(`UPDATE Caso SET SolicitarCierre = @SolicitarCierre WHERE IdCaso = @IdCaso`);
+                  .input('SolicitarCierre', sql.Int, 3) 
+                  .query(`UPDATE Caso SET IdSituacion = @SolicitarCierre WHERE IdCaso = @IdCaso`);
     res.status(500).json({ message: "Caso solicitado correctamente"});
   }
   })
@@ -177,8 +178,8 @@ router.put("/solicitar/:id", async (req,res)=>{
       console.log("hola")
       const result = await pool.request()
                     .input('IdCaso', sql.Int, id)
-                    .input('SolicitarCierre', sql.Bit, false) 
-                    .query(`UPDATE Caso SET EnCurso = @SolicitarCierre WHERE IdCaso = @IdCaso`);
+                    .input('SolicitarCierre', sql.Int, 1) 
+                    .query(`UPDATE Caso SET IdSituacion = @SolicitarCierre WHERE IdCaso = @IdCaso`);
       console.log(result.recordset)
     }
     })
@@ -191,8 +192,8 @@ router.put("/solicitar/:id", async (req,res)=>{
         console.log("hola")
         const result = await pool.request()
                       .input('IdCaso', sql.Int, id)
-                      .input('SolicitarCierre', sql.Bit, false)
-                      .query(`UPDATE Caso SET SolicitarCierre = @SolicitarCierre WHERE IdCaso = @IdCaso`);
+                      .input('SolicitarCierre', sql.Int, 2)
+                      .query(`UPDATE Caso SET IdSituacion = @SolicitarCierre WHERE IdCaso = @IdCaso`);
         console.log(result.recordset)
       }
       })
