@@ -23,6 +23,7 @@ router.get('', async (req, res) => {
                   C.FechaOcurrencia,
                   C.FechaSolicitud,
                   C.Diagnostico,
+                  S.Nombre AS NombreSituacion,
                   P.Nombre AS NombrePaciente,
                   PR.Nombre AS NombrePrestador,
                   PS.Nombre AS NombrePrestacion
@@ -30,7 +31,8 @@ router.get('', async (req, res) => {
                   Caso C
                   INNER JOIN Paciente P ON C.IdPaciente = P.IdPaciente
                   INNER JOIN Prestador PR ON C.IdPrestador = PR.IdPrestador
-                  INNER JOIN Prestacion PS ON C.IdPrestacion = PS.IdPrestacion`);
+                  INNER JOIN Prestacion PS ON C.IdPrestacion = PS.IdPrestacion
+                  INNER JOIN Situacion S ON C.IdSituacion = S.IdSituacion`);
         res.json(result.recordset);
       } else {
         res.status(500).json({ message: "No se pudo establecer conexión con la base de datos" });
@@ -89,7 +91,7 @@ router.get("/:id/devolucion", async (req,res)=>{
 router.post('', async (req, res) => {
   const { nombre, localidad, dni, prestacion, telefono, diagnostico, direccion, fechaNacimiento, cantDias, horasDia, prestador } = req.body;
   console.log(prestador)
-  if (!nombre || !localidad || !dni || !prestacion || !telefono || !diagnostico || !direccion || !fechaNacimiento || !cantDias || !horasDia) {
+  if (!nombre || !localidad || !dni || !prestacion || !telefono || !diagnostico || !direccion || !fechaNacimiento || !cantDias || !horasDia ||!prestador) {
     return res.status(400).json({ error: "Faltan datos" });
   }
 
@@ -124,6 +126,10 @@ router.post('', async (req, res) => {
       return res.status(500).json({ error: "Paciente no encontrado" });
     }
     console.log("prestaciopn " + prestacion)
+    console.log("prestador  " + prestador)
+
+
+  
 
 
     const idPaciente = result1.recordset[0].IdPaciente;
