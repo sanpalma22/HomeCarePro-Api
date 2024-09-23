@@ -15,7 +15,7 @@ const getConnection = async () => {
 
 
 router.post('', async (req, res) => {
-    const { dni, nombre, apellido, direccion, localidad, telefono, email, genero, contraseña } = req.body;
+    const { dni, nombre, apellido, direccion, localidad, telefono, email, genero, contraseña,especialidad } = req.body;
   
     if (!nombre || !localidad || !dni || !apellido || !telefono || !email || !direccion || !genero || !contraseña) {
       return res.status(400).json({ error: "Faltan datos" });
@@ -34,7 +34,7 @@ router.post('', async (req, res) => {
         VALUES (@idEspecialidad, @dni, @nombre, @apellido, @direccion, @localidad, @telefono, @email, @genero, @contraseña);
       `;
       await pool.request()
-        .input('idEspecialidad', sql.Int, 1) // Cambiado a dni
+        .input('idEspecialidad', sql.Int, especialidad) // Cambiado a dni
         .input('dni', sql.Int, dni) // Cambiado a dni
         .input('nombre', sql.NVarChar, nombre)
         .input('apellido', sql.NVarChar, apellido)
