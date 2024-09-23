@@ -46,7 +46,7 @@ router.get("/:id", async (req,res)=>{
     if (pool) {
       console.log("hola")
       const result = await sql.query( `
-      SELECT c.IdCaso, c.FechaOcurrencia, c.FechaSolicitud, c.Diagnostico, c.CantDias, c.CantHorasDias, c.EnCurso, c.Idcaso, pa.IdPaciente, pa.Dni, pa.Nombre, pa.Apellido, pa.Direccion, pa.Localidad, pa.Telefono, pa.FechaNacimiento, pr.Nombre as NombrePrestador
+      SELECT c.IdCaso, c.FechaOcurrencia, c.FechaSolicitud, c.Diagnostico, c.CantDias, c.CantHorasDias, c.EnCurso, c.Idcaso, pa.IdPaciente, pa.Dni, pa.Nombre, pa.Apellido, pa.Direccion, pa.Localidad, pa.Telefono, pa.FechaNacimiento, pr.Nombre as NombrePrestador, c.IdSituacion
       FROM Caso AS c INNER JOIN Paciente as pa ON pa.IdPaciente = c.IdPaciente
       INNER JOIN Prestador as pr ON pr.IdPrestador = c.IdPrestador
       
