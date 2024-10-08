@@ -1,5 +1,5 @@
 const config = {
-  server: "A-PHZ2-CIDI-27", 
+  server: "A-PHZ2-CEO-17", 
   database: "HomeCareProBD",
   user: "alumno",
   password: "alumno",
