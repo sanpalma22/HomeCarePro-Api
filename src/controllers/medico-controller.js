@@ -27,6 +27,7 @@ router.get('', async (req, res) => {
                 Prestador P
                 INNER JOIN Especialidad E ON P.IdEspecialidad = E.IdEspecialidad`);
       res.json(result.recordset);
+
     } else {
       res.status(500).json({ message: "No se pudo establecer conexión con la base de datos" });
     }

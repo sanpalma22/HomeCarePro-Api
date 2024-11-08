@@ -7,6 +7,8 @@ import Especialidadcontroller from "./src/controllers/especialidad-contrroller.j
 import PrestacionController from "./src/controllers/prestacion-controller.js";
 import config from "./src/config/dbConfig.js";
 import { MailerSend } from 'mailersend';
+import  axios from "axios";
+import https from "https";
 
 import sql from "mssql";
 const app = express();
@@ -174,37 +176,14 @@ app.put("/medicooo/contrasena", async (req, res) => {
 const clave = "mlsn.8ccfddd6d0fd8ada85a73002ee2e0369120101e9eea389aee774d3b2f409a05a";
 
 app.post('/medicoooo/codigo', async (req, res) => {
-  try {
-    console.log("Hola");
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  console.log("Solicitud recibida para generar código");
 
-    // Crear instancia de MailerSend
-    const mailersend = new MailerSend({
-      apiKey: clave,
-    });
-    console.log('API Key:', clave); // Asegúrate de que la API Key sea correcta
+  // Generar un código aleatorio (4 dígitos)
+  const code = Math.floor(1000 + Math.random() * 9000).toString();
+console.log(code)
+  // Responder con el código generado
+  res.json({ code });
 
-    // Definir parámetros del email
-    const response = await mailersend.email.send({
-      from: 'ramirosued07@gmail.com', // Cambia esto por tu dirección de correo válida
-      fromName: 'Ramiro Sued', // Cambia esto por tu nombre o el nombre de tu empresa
-      to: [
-        {
-          email: 'spalma0610@gmail.com', // Cambia aquí el destinatario
-          name: 'Recipient Name', // Opcional: cambia por el nombre del destinatario
-        },
-      ],
-      subject: 'Subject', // Cambia esto por el asunto del correo
-      html: 'Greetings from the team, you got this message through MailerSend.', // Contenido en HTML del correo
-      text: 'Greetings from the team, you got this message through MailerSend.', // Contenido en texto plano del correo
-    });
-
-    console.log('Correo enviado exitosamente:', response);
-    res.send('Correo enviado exitosamente');
-  } catch (error) {
-    console.error('Error al enviar el correo:', error.response ? error.response.data : error.message);
-    res.status(500).send('Error al enviar el correo');
-  }
 });
 
 

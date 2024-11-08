@@ -13,6 +13,27 @@ const getConnection = async () => {
   }
 }; 
 
+router.get('/:id', async(req,res)=>{
+const prestadorId = parseInt(req.params.id);
+try {
+  const pool = await getConnection();
+if(pool){
+  const result = await sql.query(`SELECT 
+  P.*,
+  E.Nombre AS Especialidad
+FROM 
+  Prestador P
+  INNER JOIN Especialidad E ON P.IdEspecialidad = E.IdEspecialidad where P.IdPrestador = ${prestadorId}`);
+  res.json(result.recordset);
+  }
+  else {
+    res.status(500).json({ message: "No se pudo establecer conexión con la base de datos" });
+  }
+} catch (error) {
+  console.error("Error al obtener los casos activos:", error);
+  res.status(500).json({ message: "Error interno del servidor" });
+}
+})
 
 router.post('', async (req, res) => {
     const { dni, nombre, apellido, direccion, localidad, telefono, email, genero, contraseña,especialidad } = req.body;
