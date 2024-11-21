@@ -175,14 +175,34 @@ app.put("/medicooo/contrasena", async (req, res) => {
 
 const clave = "mlsn.8ccfddd6d0fd8ada85a73002ee2e0369120101e9eea389aee774d3b2f409a05a";
 
-app.post('/medicoooo/codigo', async (req, res) => {
-  console.log("Solicitud recibida para generar código");
+app.get('/medicoooo/codigo/:id', async (req, res) => {
+  const id = parseInt(req.params.id)
+  console.log(id)
+  try {
+    console.log("entro");
+    
+    const pool = await getConnection();
+    
+    if (pool) {
+        console.log("holaaaaaaaaaaa");
+        
+        const result = await sql.query( `
+        SELECT mail from Paciente INNER JOIN Caso ON Caso.IdPaciente = Paciente.IdPaciente
 
-  // Generar un código aleatorio (4 dígitos)
-  const code = Math.floor(1000 + Math.random() * 9000).toString();
-console.log(code)
-  // Responder con el código generado
-  res.json({ code });
+        
+        WHERE Caso.IdCaso = ${id}
+      `)
+            
+        console.log(result.recordset[0].mail);
+        res.json(result.recordset[0].mail);
+    } else {
+        res.status(500).json({ error: 'No se pudo establecer conexión con la base de datos' });
+    }
+} catch (err) {
+    console.error('Error en la solicitud:', err);
+    res.status(500).json({ error: 'Error en el servidor' });
+}
+
 
 });
 
