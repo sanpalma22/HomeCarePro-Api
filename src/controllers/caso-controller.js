@@ -82,7 +82,10 @@ router.get("/:id/devolucion", async (req,res)=>{
     if (pool) {
       console.log("hola")
       console.log(req.params.id);
-      const result = await sql.query(`SELECT * FROM InformeDia where IdCaso = ${id} `);
+      const result = await sql.query(`SELECT InformeDia.*, Caso.IdSituacion, Caso.IdPrestador
+      FROM InformeDia
+      INNER JOIN Caso ON Caso.IdCaso = InformeDia.IdCaso
+      WHERE Caso.IdCaso = ${id} `);
     res.json(result.recordset);
     console.log(result)
   }
