@@ -54,7 +54,7 @@ app.get("/medico/:id/devolucion", async (req,res)=>{
     if (pool) {
       console.log("holaaaaaaaaaaa")
       const result = await sql.query( `
-      SELECT Caso.Idcaso, InformeDia.Descripcion from Caso INNER JOIN InformeDia ON InformeDia.IdCaso = Caso.IdCaso
+      SELECT Caso.Idcaso, Caso.IdPrestador, InformeDia.Descripcion from Caso INNER JOIN InformeDia ON InformeDia.IdCaso = Caso.IdCaso
       WHERE Caso.IdCaso = ${id}
     `)
     console.log(result.recordset)

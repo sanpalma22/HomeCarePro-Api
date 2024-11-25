@@ -80,7 +80,7 @@ router.get("/:id/devolucion", async (req,res)=>{
     if (pool) {
       console.log("hola")
       console.log(req.params.id);
-      const result = await sql.query(`SELECT InformeDia.*, Caso.IdSituacion
+      const result = await sql.query(`SELECT InformeDia.*, Caso.IdSituacion, Caso.IdPrestador
       FROM InformeDia
       INNER JOIN Caso ON Caso.IdCaso = InformeDia.IdCaso
       WHERE Caso.IdCaso = ${id} `);
