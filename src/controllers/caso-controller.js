@@ -23,6 +23,7 @@ router.get('', async (req, res) => {
                   C.FechaOcurrencia,
                   C.FechaSolicitud,
                   C.Diagnostico,
+                  C.IdSituacion,
                   S.Nombre AS NombreSituacion,
                   P.Nombre AS NombrePaciente,
                   PR.Nombre AS NombrePrestador,
@@ -55,6 +56,7 @@ router.get('', async (req, res) => {
                   C.FechaOcurrencia,
                   C.FechaSolicitud,
                   C.Diagnostico,
+                  C.IdSituacion,
                   P.Nombre AS NombrePaciente,
                   PR.Nombre AS NombrePrestador,
                   PS.Nombre AS NombrePrestacionX
@@ -181,7 +183,7 @@ router.put("/solicitar/:id", async (req,res)=>{
     const id = req.params.id;
     const pool = await getConnection();
     if(pool){
-      console.log("hola")
+      console.log("entro")
       const result = await pool.request()
                     .input('IdCaso', sql.Int, id)
                     .input('SolicitarCierre', sql.Int, 1) 

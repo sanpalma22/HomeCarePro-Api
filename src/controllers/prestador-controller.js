@@ -78,5 +78,18 @@ router.post('', async (req, res) => {
   });
 
 
+  router.put("/baja/:id", async (req,res)=>{
+    const id = req.params.id;
+    const pool = await getConnection();
+    if(pool){
+      console.log("entro")
+      const result = await pool.request()
+                    .input('IdPrestador', sql.Int, id)
+                    .input('BajaMedico', sql.Bit, false) 
+                    .query(`UPDATE Prestador SET Activo = @BajaMedico WHERE IdPrestador = @IdPrestador`);
+      console.log(result.recordset)
+    }
+    })
+
 
 export default router;
