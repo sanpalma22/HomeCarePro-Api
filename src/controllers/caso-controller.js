@@ -1,6 +1,7 @@
 import { Router } from "express";
 import config from "../config/dbConfig.js";
 import sql from "mssql";
+import Mail from "nodemailer/lib/mailer/index.js";
 
 let router = Router();
 const getConnection = async () => {
@@ -110,6 +111,7 @@ router.post("", async (req, res) => {
     cantDias,
     horasDia,
     prestador,
+    mail
   } = req.body;
 
   // Validar datos
@@ -124,7 +126,8 @@ router.post("", async (req, res) => {
     !fechaNacimiento ||
     !cantDias ||
     !horasDia ||
-    !prestador
+    !prestador ||
+    !mail
   ) {
     return res.status(400).json({ error: "Faltan datos" });
   }
@@ -139,8 +142,8 @@ router.post("", async (req, res) => {
 
     // Insertar en tabla Paciente
     const queryPaciente = `
-      INSERT INTO Paciente (Dni, Nombre, Direccion, Localidad, Telefono, FechaNacimiento)
-      VALUES (@dni, @nombre, @direccion, @localidad, @telefono, @fechaNacimiento);
+      INSERT INTO Paciente (Dni, Nombre, Direccion, Localidad, Telefono, FechaNacimiento, mail)
+      VALUES (@dni, @nombre, @direccion, @localidad, @telefono, @fechaNacimiento, @mail);
     `;
     await pool
       .request()
@@ -150,6 +153,8 @@ router.post("", async (req, res) => {
       .input("localidad", sql.NVarChar, localidad)
       .input("telefono", sql.NVarChar, telefono)
       .input("fechaNacimiento", sql.DateTime, new Date(fechaNacimiento))
+      .input("mail", sql.NVarChar, mail)
+
       .query(queryPaciente);
 
     // Obtener IdPaciente
