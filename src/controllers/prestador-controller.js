@@ -36,9 +36,9 @@ FROM
 })
 
 router.post('', async (req, res) => {
-    const { dni, nombre, apellido, direccion, localidad, telefono, email, genero, contraseña,especialidad } = req.body;
+    const { dni, nombre, direccion, localidad, telefono, email, genero, contraseña,especialidad } = req.body;
   
-    if (!nombre || !localidad || !dni || !apellido || !telefono || !email || !direccion || !genero || !contraseña) {
+    if (!nombre || !localidad || !dni || !telefono || !email || !direccion || !genero || !contraseña) {
       return res.status(400).json({ error: "Faltan datos" });
     }
   
@@ -51,14 +51,13 @@ router.post('', async (req, res) => {
   
       // Inserción en la tabla Paciente
       const query1 = `
-        INSERT INTO Prestador (IdEspecialidad, Dni, Nombre, Apellido, Direccion, Localidad, Telefono, Email, Genero, Contraseña)
-        VALUES (@idEspecialidad, @dni, @nombre, @apellido, @direccion, @localidad, @telefono, @email, @genero, @contraseña);
+        INSERT INTO Prestador (IdEspecialidad, Dni, Nombre, Direccion, Localidad, Telefono, Email, Genero, Contraseña, Activo)
+        VALUES (@idEspecialidad, @dni, @nombre, @direccion, @localidad, @telefono, @email, @genero, @contraseña, 1);
       `;
       await pool.request()
         .input('idEspecialidad', sql.Int, especialidad) // Cambiado a dni
         .input('dni', sql.Int, dni) // Cambiado a dni
         .input('nombre', sql.NVarChar, nombre)
-        .input('apellido', sql.NVarChar, apellido)
         .input('direccion', sql.NVarChar, direccion)
         .input('localidad', sql.NVarChar, localidad)
         .input('telefono', sql.Int, parseInt(telefono))
